@@ -320,12 +320,18 @@ def start_user_bot(user_id: str, write_config: bool = True) -> dict:
     try:
         import platform
         python_cmd = "python" if platform.system() == "Windows" else "python3"
+        
+        # Create log file
+        log_file = LOG_DIR / f"bot_{user_id}.log"
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+        
         proc = subprocess.Popen(
             [python_cmd, "app.py"],
             cwd=str(BOT_ENGINE_DIR),
             env={**os.environ, "PORT": str(port), "HOST": "127.0.0.1"},
-            stdout=open(LOG_DIR / f"bot_{user_id}.log", "w"),
+            stdout=open(log_file, "w"),
             stderr=subprocess.STDOUT,
+            preexec_fn=None if platform.system() == "Windows" else lambda: os.setsid(),
         )
 
         DB.setdefault("bot_processes", {})[user_id] = {
@@ -337,17 +343,40 @@ def start_user_bot(user_id: str, write_config: bool = True) -> dict:
 
         logger.info(f"Started bot-engine for user {user_id}: PID={proc.pid}, port={port}")
 
-        for i in range(10):
+        # Use longer timeout on Railway (or any non-Windows environment)
+        is_railway = bool(os.environ.get("RAILWAY_ENVIRONMENT_NAME"))
+        max_wait = 30 if is_railway else 15
+        port_timeout = 5.0 if is_railway else 2.0
+        
+        for i in range(max_wait):
             time.sleep(1)
-            if _is_port_open(port):
+            
+            # Check if process is still alive
+            if not _check_bot_process_alive(proc.pid):
+                # Process died, read the log to see what went wrong
+                try:
+                    with open(log_file, "r") as f:
+                        last_lines = f.readlines()[-20:]  # Last 20 lines
+                    error_msg = "".join(last_lines)
+                    logger.error(f"Bot process {proc.pid} died. Last logs:\n{error_msg}")
+                except:
+                    pass
+                DB.get("bot_processes", {}).pop(user_id, None)
+                save_db(DB)
+                return {"success": False, "error": "Bot process crashed on startup. Check logs."}
+            
+            # Check if port is open
+            if _is_port_open(port, timeout=port_timeout):
                 logger.info(f"Bot-engine ready on port {port} after {i+1}s")
-                break
-        else:
-            logger.warning(f"Bot-engine port {port} not ready after 10s, proceeding anyway")
-
-        return {"success": True, "port": port, "pid": proc.pid}
+                return {"success": True, "port": port, "pid": proc.pid}
+        
+        # Timeout - bot didn't come up but process is still alive
+        logger.warning(f"Bot-engine port {port} not ready after {max_wait}s, but process alive (PID={proc.pid})")
+        # Return success anyway - user might need to wait a bit longer
+        return {"success": True, "port": port, "pid": proc.pid, "warning": "Bot starting, please wait..."}
+        
     except Exception as e:
-        logger.error(f"Failed to start bot for {user_id}: {e}")
+        logger.error(f"Failed to start bot for {user_id}: {e}", exc_info=True)
         return {"success": False, "error": str(e)}
 
 def stop_user_bot(user_id: str) -> dict:
@@ -407,6 +436,21 @@ def _is_port_open(port: int, host: str = "127.0.0.1", timeout: float = 1.0) -> b
     except (ConnectionRefusedError, TimeoutError, OSError):
         return False
 
+def _check_bot_process_alive(pid: int) -> bool:
+    """Check if a process is still alive (cross-platform)."""
+    import platform
+    try:
+        if platform.system() == "Windows":
+            import ctypes
+            return ctypes.windll.kernel32.GetExitCodeProcess(int(pid), ctypes.byref(ctypes.c_ulong())) != 0
+        else:
+            os.kill(pid, 0)  # Signal 0 doesn't kill, just checks if process exists
+            return True
+    except ProcessLookupError:
+        return False
+    except Exception:
+        return False
+
 
 def get_bot_status(user_id: str) -> dict:
     """Get bot status for a user. Uses port check instead of os.kill (Windows safe)."""
@@ -415,12 +459,24 @@ def get_bot_status(user_id: str) -> dict:
         return {"running": False}
 
     port = proc_info["port"]
+    pid = proc_info.get("pid")
+    
+    # Check if process is still alive first
+    if pid and not _check_bot_process_alive(pid):
+        logger.warning(f"get_bot_status({user_id[:8]}): Process {pid} is dead, removing entry")
+        DB.get("bot_processes", {}).pop(user_id, None)
+        save_db(DB)
+        return {"running": False}
 
-    if _is_port_open(port):
+    # Use longer timeout on Railway
+    is_railway = bool(os.environ.get("RAILWAY_ENVIRONMENT_NAME"))
+    port_timeout = 5.0 if is_railway else 2.0
+    
+    if _is_port_open(port, timeout=port_timeout):
         return {
             "running": True,
             "port": port,
-            "pid": proc_info.get("pid"),
+            "pid": pid,
             "started_at": proc_info.get("started_at"),
         }
 
@@ -432,17 +488,20 @@ def get_bot_status(user_id: str) -> dict:
     except:
         age = 999
 
-    if age < 15:
-        logger.debug(f"get_bot_status({user_id[:8]}): port {port} not ready yet, bot age {age:.0f}s, waiting")
+    # On Railway, give bot more time to start (up to 60 seconds)
+    grace_period = 60 if is_railway else 15
+    
+    if age < grace_period:
+        logger.debug(f"get_bot_status({user_id[:8]}): port {port} not ready yet, bot age {age:.0f}s, grace period {grace_period}s")
         return {
             "running": True,
             "port": port,
-            "pid": proc_info.get("pid"),
+            "pid": pid,
             "started_at": proc_info.get("started_at"),
             "starting": True,
         }
 
-    logger.warning(f"get_bot_status({user_id[:8]}): port {port} not open after {age:.0f}s, clearing entry")
+    logger.warning(f"get_bot_status({user_id[:8]}): port {port} not open after {age:.0f}s (grace {grace_period}s), clearing entry")
     DB.get("bot_processes", {}).pop(user_id, None)
     save_db(DB)
     return {"running": False}
@@ -458,7 +517,12 @@ def proxy_to_bot(user_id: str, method: str, path: str, body=None) -> dict:
         data = json.dumps(body).encode("utf-8") if body and method != "GET" else None
         req = urllib.request.Request(url, data=data, method=method)
         req.add_header("Content-Type", "application/json")
-        with urllib.request.urlopen(req, timeout=10) as response:
+        
+        # Use longer timeout on Railway
+        is_railway = bool(os.environ.get("RAILWAY_ENVIRONMENT_NAME"))
+        proxy_timeout = 30.0 if is_railway else 10.0
+        
+        with urllib.request.urlopen(req, timeout=proxy_timeout) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         try:
@@ -466,6 +530,7 @@ def proxy_to_bot(user_id: str, method: str, path: str, body=None) -> dict:
         except:
             return {"success": False, "error": f"HTTP {e.code}"}
     except Exception as e:
+        logger.error(f"Proxy error for user {user_id}: {e}")
         return {"success": False, "error": str(e)}
 
 # ============================================================
