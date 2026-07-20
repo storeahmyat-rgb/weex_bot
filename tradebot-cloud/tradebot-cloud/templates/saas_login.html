@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeBot SaaS - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0b0e11 0%, #1a1d24 100%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            color: #eaecef; padding: 20px;
+        }
+        .login-card {
+            background: #1e2126; border: 1px solid #2a2e36; border-radius: 16px;
+            padding: 40px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .logo {
+            width: 72px; height: 72px; background: linear-gradient(135deg, #f0b90b 0%, #f8d12f 100%);
+            color: #0b0e11; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 32px; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(240,185,11,0.3);
+        }
+        .title { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .subtitle { text-align: center; font-size: 13px; color: #848e9c; margin-bottom: 28px; line-height: 1.5; }
+        .tabs { display: flex; background: #0b0e11; border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+        .tab {
+            flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px;
+            font-size: 13px; font-weight: 600; color: #848e9c; border: none; background: none; transition: all 0.2s;
+        }
+        .tab.active { background: #f0b90b; color: #0b0e11; }
+        .form-group { margin-bottom: 16px; }
+        .label { display: block; font-size: 12px; color: #848e9c; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input {
+            width: 100%; padding: 14px 16px; background: #0b0e11; border: 1px solid #2a2e36;
+            color: #eaecef; border-radius: 10px; font-size: 14px; transition: border 0.2s;
+        }
+        .input:focus { outline: none; border-color: #f0b90b; }
+        .btn {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #f0b90b 0%, #f8d12f 100%);
+            color: #0b0e11; border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error {
+            background: rgba(246,70,93,0.1); border: 1px solid rgba(246,70,93,0.3);
+            color: #f6465d; padding: 12px 14px; border-radius: 8px; font-size: 13px;
+            margin-bottom: 16px; display: none;
+        }
+        .error.show { display: block; }
+        .info {
+            background: rgba(240,185,11,0.08); border: 1px dashed rgba(240,185,11,0.3);
+            color: #f0b90b; padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6; margin-top: 20px;
+        }
+        .admin-link { display: block; text-align: center; margin-top: 16px; color: #848e9c; font-size: 12px; text-decoration: none; }
+        .admin-link:hover { color: #f0b90b; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">T</div>
+        <h1 class="title">TradeBot SaaS</h1>
+        <p class="subtitle">EMA 8,13,21,55 Trading Bot Platform<br>24/7 Cloud Trading</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login', event)">Login</button>
+            <button class="tab" onclick="switchTab('signup', event)">Sign Up</button>
+        </div>
+
+        <div id="errorMsg" class="error"></div>
+
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="form-group">
+                <label class="label">Email</label>
+                <input type="email" id="loginEmail" class="input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="label">Password</label>
+                <input type="password" id="loginPassword" class="input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="loginBtn" class="btn">Login</button>
+        </form>
+
+        <form id="signupForm" onsubmit="return handleSignup(event)" style="display:none;">
+            <div class="form-group">
+                <label class="label">Name (optional)</label>
+                <input type="text" id="signupName" class="input" placeholder="Your name">
+            </div>
+            <div class="form-group">
+                <label class="label">Email</label>
+                <input type="email" id="signupEmail" class="input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="label">Password (min 6 chars)</label>
+                <input type="password" id="signupPassword" class="input" placeholder="••••••••" required minlength="6">
+            </div>
+            <button type="submit" id="signupBtn" class="btn">Create Account</button>
+        </form>
+
+        <div class="info">
+            ⚡ <strong>License required:</strong> Account banne ke baad license key enter karein.<br>
+            Admin se license key lein.<br><br>
+            Strategy: EMA 8, 13, 21, 55 crossover<br>
+            Strict 1:3 Risk-Reward (SL=2%, TP=6%)
+        </div>
+
+        <a href="/admin" class="admin-link">Admin Login →</a>
+    </div>
+
+    <script>
+        function switchTab(tab, event) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+            document.getElementById('errorMsg').classList.remove('show');
+        }
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg; el.classList.add('show');
+        }
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true; btn.textContent = 'Logging in...';
+            try {
+                const r = await fetch('/api/auth/login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        email: document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value,
+                    })
+                });
+                const data = await r.json();
+                if (data.success) window.location.href = '/';
+                else showError(data.error || 'Login failed');
+            } catch(err) { showError('Network error'); }
+            btn.disabled = false; btn.textContent = 'Login';
+            return false;
+        }
+        async function handleSignup(e) {
+            e.preventDefault();
+            const btn = document.getElementById('signupBtn');
+            btn.disabled = true; btn.textContent = 'Creating account...';
+            try {
+                const r = await fetch('/api/auth/signup', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name: document.getElementById('signupName').value,
+                        email: document.getElementById('signupEmail').value,
+                        password: document.getElementById('signupPassword').value,
+                    })
+                });
+                const data = await r.json();
+                if (data.success) window.location.href = '/';
+                else showError(data.error || 'Signup failed');
+            } catch(err) { showError('Network error'); }
+            btn.disabled = false; btn.textContent = 'Create Account';
+            return false;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b0e11">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="manifest" href="/static/manifest.json">
+    <title>Binance Futures Bot - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0b0e11 0%, #1a1d24 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background: #1e2126;
+            border: 1px solid #2a2e36;
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .login-logo {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #f0b90b 0%, #f8d12f 100%);
+            color: #0b0e11;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 32px;
+            margin: 0 auto 16px;
+            box-shadow: 0 4px 16px rgba(240, 185, 11, 0.3);
+        }
+        .login-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #eaecef;
+            margin-bottom: 8px;
+        }
+        .login-subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: #848e9c;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .login-form-group {
+            margin-bottom: 16px;
+        }
+        .login-label {
+            display: block;
+            font-size: 12px;
+            color: #848e9c;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0b0e11;
+            border: 1px solid #2a2e36;
+            color: #eaecef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: border 0.2s;
+            box-sizing: border-box;
+        }
+        .login-input:focus {
+            outline: none;
+            border-color: #f0b90b;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #f0b90b 0%, #f8d12f 100%);
+            color: #0b0e11;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .login-btn:hover {
+            transform: translateY(-1px);
+        }
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .login-error {
+            background: rgba(246, 70, 93, 0.1);
+            border: 1px solid rgba(246, 70, 93, 0.3);
+            color: #f6465d;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-error.show {
+            display: block;
+        }
+        .login-success {
+            background: rgba(14, 203, 129, 0.1);
+            border: 1px solid rgba(14, 203, 129, 0.3);
+            color: #0ecb81;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-success.show {
+            display: block;
+        }
+        .login-info {
+            background: rgba(240, 185, 11, 0.08);
+            border: 1px dashed rgba(240, 185, 11, 0.3);
+            color: #f0b90b;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #5e6673;
+        }
+        .hw-id-box {
+            background: #181a20;
+            border: 1px dashed #2a2e36;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #848e9c;
+            word-break: break-all;
+        }
+        .hw-id-label {
+            font-size: 10px;
+            color: #5e6673;
+            text-transform: uppercase;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-logo">B</div>
+        <h1 class="login-title">Binance Futures Bot</h1>
+        <p class="login-subtitle">EMA Quad Strategy (8, 13, 21, 55)<br>License activate karein</p>
+
+        <div id="errorMsg" class="login-error"></div>
+        <div id="successMsg" class="login-success"></div>
+
+        <form id="loginForm" onsubmit="return activateLicense(event)">
+            <div class="login-form-group">
+                <label class="login-label">License Key</label>
+                <input
+                    type="text"
+                    id="licenseKey"
+                    class="login-input"
+                    placeholder="TRDBOT-XXXX-XXXX-XXXX-XXXX"
+                    autocomplete="off"
+                    required
+                    style="text-transform: uppercase;"
+                >
+            </div>
+            <button type="submit" id="activateBtn" class="login-btn">Activate License</button>
+        </form>
+
+        <div class="hw-id-label">Your Hardware ID (admin ko bhejne ke liye):</div>
+        <div id="hwId" class="hw-id-box">Loading...</div>
+
+        <div class="login-info">
+            ⚠️ <strong>Zaroori:</strong> Ek license sirf ek PC pe activate ho sakta hai.
+            Agar PC change karna hai to admin se contact karein.<br><br>
+            💡 License nahi hai? Admin se <strong>license key</strong> lein.
+        </div>
+
+        <div class="login-footer">
+            © 2024 Binance Futures Bot
+        </div>
+    </div>
+
+    <script>
+        // Get hardware ID
+        fetch('/api/license/status')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('hwId').textContent = data.hw_id || 'Unknown';
+                if (data.success) {
+                    // Already activated - redirect to dashboard
+                    window.location.href = '/';
+                }
+            })
+            .catch(e => {
+                document.getElementById('hwId').textContent = 'Error: ' + e;
+            });
+
+        function activateLicense(event) {
+            event.preventDefault();
+            const key = document.getElementById('licenseKey').value.trim();
+            const btn = document.getElementById('activateBtn');
+            const errEl = document.getElementById('errorMsg');
+            const succEl = document.getElementById('successMsg');
+
+            errEl.classList.remove('show');
+            succEl.classList.remove('show');
+
+            if (!key) {
+                errEl.textContent = 'License key daalo';
+                errEl.classList.add('show');
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Activating...';
+
+            fetch('/api/license/activate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = 'Activate License';
+                if (data.success) {
+                    const lic = data.license;
+                    succEl.innerHTML = `✅ License activated!<br>
+                        Plan: ${lic.plan_days} days<br>
+                        Days remaining: ${lic.days_remaining}<br>
+                        Redirecting...`;
+                    succEl.classList.add('show');
+                    setTimeout(() => { window.location.href = '/'; }, 2000);
+                } else {
+                    errEl.textContent = data.error || 'Activation failed';
+                    errEl.classList.add('show');
+                }
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.textContent = 'Activate License';
+                errEl.textContent = 'Error: ' + e;
+                errEl.classList.add('show');
+            });
+            return false;
+        }
+    </script>
+</body>
+</html>

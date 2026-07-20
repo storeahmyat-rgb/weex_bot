@@ -1,0 +1,8 @@
+2026-07-19 23:15:21,246 [INFO] app: ============================================================
+2026-07-19 23:15:21,250 [INFO] app:  Bot Engine - Starting (port 5000)
+2026-07-19 23:15:21,254 [INFO] app: ============================================================
+2026-07-19 23:15:21,355 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.171:5000
+2026-07-19 23:15:21,361 [INFO] werkzeug: [33mPress CTRL+C to quit[0m

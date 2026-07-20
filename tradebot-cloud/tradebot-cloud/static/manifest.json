@@ -1,0 +1,26 @@
+{
+    "name": "Binance Futures Bot",
+    "short_name": "TradingBot",
+    "description": "EMA Quad Strategy Trading Bot - Binance & WEEX",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0b0e11",
+    "theme_color": "#f0b90b",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/static/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/static/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["finance", "productivity"]
+}

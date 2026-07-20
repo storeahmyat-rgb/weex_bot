@@ -1,0 +1,32 @@
+{
+  "api_key": "AdminBot@2024!",
+  "api_secret": "045a920f48731e59617ed6975d161428a8969ad6a404518a1974ddbc05d07574",
+  "api_passphrase": "Student1085296",
+  "exchange": "weex",
+  "testnet": true,
+  "symbol": "BCHSUSDT",
+  "symbols_list": [
+    "BCHSUSDT"
+  ],
+  "timeframe": "5m",
+  "leverage": 100,
+  "amount_mode": "percent",
+  "amount": 100,
+  "amount_pct": 10,
+  "stop_loss_pct": 2,
+  "take_profit_pct": 6,
+  "mode": "both",
+  "auto_start": false,
+  "telegram_enabled": false,
+  "telegram_bot_token": "",
+  "telegram_chat_id": "",
+  "email_enabled": false,
+  "email_smtp_server": "smtp.gmail.com",
+  "email_smtp_port": 587,
+  "email_sender": "",
+  "email_password": "",
+  "email_receiver": "",
+  "whatsapp_enabled": false,
+  "whatsapp_phone": "",
+  "whatsapp_apikey": ""
+}

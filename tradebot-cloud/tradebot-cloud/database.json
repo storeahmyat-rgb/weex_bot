@@ -1,0 +1,131 @@
+{
+  "users": {
+    "449877fe-b77f-46ae-9e05-6535598a41c5": {
+      "id": "449877fe-b77f-46ae-9e05-6535598a41c5",
+      "email": "admin@tradebot.com",
+      "name": "Admin",
+      "password_hash": "21b978e119acedc132c269d7a804b180$1dd1c92079e73608cc158163ce676f38a8e1037fb59f4510da285b74f91fe1bf",
+      "role": "admin",
+      "banned": false,
+      "created_at": "2026-07-19T05:28:40.471131Z",
+      "subscription": {
+        "plan": "lifetime",
+        "status": "active",
+        "started_at": "2026-07-19T05:28:40.471131Z",
+        "expires_at": "9999-12-31T23:59:59Z"
+      },
+      "license_key": null,
+      "bot_config": {
+        "api_key_enc": "NRYMDQsgAABtUVxdQUU=",
+        "exchange": "weex",
+        "symbols_list": [
+          "BCHSUSDT"
+        ],
+        "timeframe": "5m",
+        "leverage": 100,
+        "amount_mode": "percent",
+        "amount": 100,
+        "amount_pct": 10,
+        "stop_loss_pct": 2,
+        "take_profit_pct": 6,
+        "mode": "both",
+        "testnet": true,
+        "telegram_enabled": false,
+        "email_enabled": false,
+        "email_smtp_server": "smtp.gmail.com",
+        "email_smtp_port": 587,
+        "whatsapp_enabled": false,
+        "api_secret_enc": "REZUBVxQXxIZW1tcRAEYXFhSRRwUQlBYW0laU0gZcXAgdn5zFCwhG1IGHVddUEoSRUtWUAEGDRcdVghfQlEaUQ==",
+        "api_passphrase_enc": "JwYUAAAMG0UdW1ldTFI="
+      }
+    },
+    "a3efc054-69b8-4b54-a06f-c03f8c5714b7": {
+      "id": "a3efc054-69b8-4b54-a06f-c03f8c5714b7",
+      "email": "storeahmyat@gmail.com",
+      "name": "ahmyr",
+      "password_hash": "885fa8ef8ca30e9b681cd7c5ca0db708$78b2183df0b448b1c7456e3e093a2e936cf859e9fc1fc005c14238b0d48c7999",
+      "role": "user",
+      "banned": false,
+      "created_at": "2026-07-19T05:29:21.381786Z",
+      "subscription": {
+        "plan": "trial",
+        "status": "active",
+        "started_at": "2026-07-19T05:29:24.991106Z",
+        "expires_at": "2026-07-26T05:28:47.597214Z"
+      },
+      "license_key": "TRDBOT-DA48-8783-C70F-4252",
+      "bot_config": {
+        "exchange": "binance",
+        "testnet": true,
+        "symbols_list": [],
+        "timeframe": "5m",
+        "leverage": 10,
+        "amount_mode": "fixed",
+        "amount": 100,
+        "amount_pct": 10,
+        "stop_loss_pct": 2,
+        "take_profit_pct": 6,
+        "mode": "both",
+        "api_key_enc": "",
+        "api_secret_enc": "",
+        "api_passphrase_enc": ""
+      }
+    },
+    "22efe533-b411-447d-91b1-ce1f87f6c60e": {
+      "id": "22efe533-b411-447d-91b1-ce1f87f6c60e",
+      "email": "test@test.com",
+      "name": "Test",
+      "password_hash": "b373d3add6b9a70df45b5345ffe49a9d$34faf3c162819c38933aa06f6877a8b1a31c86d58e724467ab13f391d03d757d",
+      "role": "user",
+      "banned": false,
+      "created_at": "2026-07-19T18:22:25.090651Z",
+      "subscription": {
+        "plan": "trial",
+        "status": "active",
+        "started_at": "2026-07-19T00:00:00Z",
+        "expires_at": "2026-12-31T23:59:59Z"
+      },
+      "license_key": null,
+      "bot_config": {
+        "exchange": "binance",
+        "testnet": true,
+        "symbols_list": [
+          "BTCUSDT",
+          "ETHUSDT"
+        ],
+        "timeframe": "5m",
+        "leverage": 10,
+        "amount_mode": "fixed",
+        "amount": 100,
+        "amount_pct": 10,
+        "stop_loss_pct": 2,
+        "take_profit_pct": 6,
+        "mode": "both",
+        "api_key_enc": "",
+        "api_secret_enc": "",
+        "api_passphrase_enc": ""
+      }
+    }
+  },
+  "licenses": {
+    "TRDBOT-DA48-8783-C70F-4252": {
+      "key": "TRDBOT-DA48-8783-C70F-4252",
+      "plan": "trial",
+      "days": 7,
+      "note": "",
+      "created_at": "2026-07-19T05:28:47.597214Z",
+      "expires_at": "2026-07-26T05:28:47.597214Z",
+      "used_by": "a3efc054-69b8-4b54-a06f-c03f8c5714b7",
+      "activated_at": "2026-07-19T05:29:24.991106Z",
+      "active": true,
+      "revoked": false
+    }
+  },
+  "bot_processes": {
+    "449877fe-b77f-46ae-9e05-6535598a41c5": {
+      "pid": 8748,
+      "port": 5001,
+      "started_at": "2026-07-20T18:59:36.319401Z"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+2026-07-19 23:55:53,043 [INFO] app: ============================================================
+2026-07-19 23:55:53,044 [INFO] app:  Bot Engine - Starting (port 5001)
+2026-07-19 23:55:53,045 [INFO] app: ============================================================
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-07-19 23:55:53,091 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-07-19 23:55:53,092 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-07-19 23:56:00,203 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:00] "GET /api/status HTTP/1.1" 200 -
+2026-07-19 23:56:00,248 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:00] "GET /api/config HTTP/1.1" 200 -
+2026-07-19 23:56:01,896 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:01] "GET /api/symbols HTTP/1.1" 200 -
+2026-07-19 23:56:01,951 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:01] "GET /api/balance HTTP/1.1" 200 -
+2026-07-19 23:56:01,996 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:01] "GET /api/status HTTP/1.1" 200 -
+2026-07-19 23:56:03,032 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:03] "GET /api/status HTTP/1.1" 200 -
+2026-07-19 23:56:04,080 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:04] "GET /api/status HTTP/1.1" 200 -
+2026-07-19 23:56:05,130 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:05] "GET /api/status HTTP/1.1" 200 -
+2026-07-19 23:56:06,175 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:56:06] "GET /api/status HTTP/1.1" 200 -

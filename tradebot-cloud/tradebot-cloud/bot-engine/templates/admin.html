@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - License Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0b0e11 0%, #1a1d24 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            color: #eaecef;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2a2e36;
+        }
+        .admin-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f0b90b;
+        }
+        .admin-card {
+            background: #1e2126;
+            border: 1px solid #2a2e36;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .admin-card h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #848e9c;
+            margin: 0 0 16px;
+        }
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .form-label {
+            display: block;
+            font-size: 11px;
+            color: #848e9c;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 8px 10px;
+            background: #0b0e11;
+            border: 1px solid #2a2e36;
+            color: #eaecef;
+            border-radius: 6px;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 8px 16px;
+            background: #f0b90b;
+            color: #0b0e11;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn:hover { background: #f8d12f; }
+        .btn-sm { padding: 4px 10px; font-size: 11px; }
+        .btn-danger { background: #f6465d; color: #fff; }
+        .btn-success { background: #0ecb81; color: #0b0e11; }
+        .btn-warn { background: transparent; color: #f0b90b; border: 1px solid #f0b90b; }
+        .btn-secondary { background: #2a2e36; color: #eaecef; }
+        .keys-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .keys-table th, .keys-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #2a2e36;
+        }
+        .keys-table th {
+            color: #848e9c;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #181a20;
+        }
+        .keys-table tr:hover { background: #181a20; }
+        .key-cell {
+            font-family: 'JetBrains Mono', monospace;
+            color: #f0b90b;
+            cursor: pointer;
+        }
+        .key-cell:hover { text-decoration: underline; }
+        .badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-active { background: rgba(14, 203, 129, 0.15); color: #0ecb81; }
+        .badge-revoked { background: rgba(246, 70, 93, 0.15); color: #f6465d; }
+        .badge-expired { background: rgba(132, 142, 156, 0.15); color: #848e9c; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #181a20;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid #f0b90b;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f0b90b;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #848e9c;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .login-overlay.hidden { display: none; }
+        .login-box {
+            background: #1e2126;
+            padding: 24px;
+            border-radius: 10px;
+            width: 320px;
+        }
+        .msg {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .msg.show { display: block; }
+        .msg-success { background: rgba(14, 203, 129, 0.1); color: #0ecb81; }
+        .msg-error { background: rgba(246, 70, 93, 0.1); color: #f6465d; }
+    </style>
+</head>
+<body>
+    <!-- Admin Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h2 style="text-align:center;margin-bottom:16px;color:#f0b90b">🔐 Admin Login</h2>
+            <input type="password" id="adminPass" class="form-input" placeholder="Admin password" style="margin-bottom:12px">
+            <button onclick="adminLogin()" class="btn" style="width:100%">Login</button>
+            <p style="text-align:center;margin-top:12px;font-size:11px;color:#848e9c">
+                Default password: <code>admin123</code> (change in app.py)
+            </p>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContent" style="display:none">
+        <div class="admin-header">
+            <h1 class="admin-title">🔐 License Management Admin Panel</h1>
+            <div>
+                <a href="/" class="btn btn-secondary btn-sm">Bot Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total Licenses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statActive">0</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statRevoked">0</div>
+                <div class="stat-label">Revoked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statExpired">0</div>
+                <div class="stat-label">Expired</div>
+            </div>
+        </div>
+
+        <div id="adminMsg" class="msg"></div>
+
+        <!-- Create New License -->
+        <div class="admin-card">
+            <h2>➕ Naya License Key Banao</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Plan (Days)</label>
+                    <select id="planDays" class="form-select">
+                        <option value="1">1 Day (Trial)</option>
+                        <option value="7">7 Days</option>
+                        <option value="30" selected>30 Days (1 Month)</option>
+                        <option value="90">90 Days (3 Months)</option>
+                        <option value="180">180 Days (6 Months)</option>
+                        <option value="365">365 Days (1 Year)</option>
+                        <option value="9999">Lifetime</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Note (optional)</label>
+                    <input type="text" id="noteField" class="form-input" placeholder="e.g. Customer name, phone">
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end">
+                    <button onclick="createKey()" class="btn" style="width:100%">Create Key</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extend License -->
+        <div class="admin-card">
+            <h2>⏰ License Extend Karo</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">License Key</label>
+                    <input type="text" id="extendKey" class="form-input" placeholder="TRDBOT-XXXX-XXXX-XXXX-XXXX" style="text-transform:uppercase">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Extra Days</label>
+                    <input type="number" id="extendDays" class="form-input" value="30" min="1">
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end">
+                    <button onclick="extendKey()" class="btn btn-success" style="width:100%">Extend</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Licenses Table -->
+        <div class="admin-card">
+            <h2>📋 Saari License Keys</h2>
+            <div style="overflow-x:auto">
+                <table class="keys-table" id="keysTable">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Status</th>
+                            <th>Plan</th>
+                            <th>Created</th>
+                            <th>Expires</th>
+                            <th>Activated</th>
+                            <th>HW ID</th>
+                            <th>Note</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keysBody">
+                        <tr><td colspan="9" style="text-align:center;color:#848e9c;padding:20px">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if already logged in
+        fetch('/api/admin/keys').then(r => r.json()).then(data => {
+            if (data.success) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('adminContent').style.display = 'block';
+                loadKeys();
+            }
+        });
+
+        function adminLogin() {
+            const pass = document.getElementById('adminPass').value;
+            fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pass })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    document.getElementById('adminContent').style.display = 'block';
+                    loadKeys();
+                } else {
+                    alert(data.error);
+                }
+            });
+        }
+
+        document.getElementById('adminPass').addEventListener('keypress', e => {
+            if (e.key === 'Enter') adminLogin();
+        });
+
+        function showMsg(text, type) {
+            const el = document.getElementById('adminMsg');
+            el.textContent = text;
+            el.className = 'msg show msg-' + type;
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        function loadKeys() {
+            fetch('/api/admin/keys')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) return;
+                    const keys = data.licenses;
+                    let active = 0, revoked = 0, expired = 0;
+                    const now = new Date();
+                    keys.forEach(k => {
+                        if (k.revoked) revoked++;
+                        else if (new Date(k.expires_at) < now) expired++;
+                        else if (k.active) active++;
+                    });
+                    document.getElementById('statTotal').textContent = keys.length;
+                    document.getElementById('statActive').textContent = active;
+                    document.getElementById('statRevoked').textContent = revoked;
+                    document.getElementById('statExpired').textContent = expired;
+
+                    const tbody = document.getElementById('keysBody');
+                    if (keys.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#848e9c;padding:20px">Koi license key nahi hai. Upar se naya banao.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = keys.map(k => {
+                        let badge = '';
+                        if (k.revoked) badge = '<span class="badge badge-revoked">Revoked</span>';
+                        else if (new Date(k.expires_at) < now) badge = '<span class="badge badge-expired">Expired</span>';
+                        else if (k.active) badge = '<span class="badge badge-active">Active</span>';
+                        const planText = k.plan_days === 9999 ? 'Lifetime' : k.plan_days + 'd';
+                        const created = new Date(k.created_at).toLocaleDateString();
+                        const expires = new Date(k.expires_at).toLocaleDateString();
+                        const activated = k.activated_at ? new Date(k.activated_at).toLocaleDateString() : '-';
+                        const hwId = k.hw_id ? k.hw_id.substring(0, 12) + '...' : '-';
+                        return `<tr>
+                            <td class="key-cell" onclick="copyKey('${k.key}')" title="Click to copy">${k.key}</td>
+                            <td>${badge}</td>
+                            <td>${planText}</td>
+                            <td>${created}</td>
+                            <td>${expires}</td>
+                            <td>${activated}</td>
+                            <td style="font-family:monospace;font-size:10px">${hwId}</td>
+                            <td>${k.note || '-'}</td>
+                            <td>
+                                ${!k.revoked ? `<button class="btn btn-warn btn-sm" onclick="revokeKey('${k.key}')">Revoke</button>` : ''}
+                                <button class="btn btn-danger btn-sm" onclick="deleteKey('${k.key}')">Delete</button>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                });
+        }
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                showMsg('Key copied: ' + key, 'success');
+            });
+        }
+
+        function createKey() {
+            const planDays = parseInt(document.getElementById('planDays').value);
+            const note = document.getElementById('noteField').value;
+            fetch('/api/admin/keys/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan_days: planDays, note: note })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const lic = data.license;
+                    showMsg('✅ License created: ' + lic.key, 'success');
+                    navigator.clipboard.writeText(lic.key).catch(()=>{});
+                    document.getElementById('noteField').value = '';
+                    loadKeys();
+                } else {
+                    showMsg('❌ ' + data.error, 'error');
+                }
+            });
+        }
+
+        function revokeKey(key) {
+            if (!confirm('Revoke karein? User access lose kar dega.')) return;
+            fetch('/api/admin/keys/revoke', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            })
+            .then(r => r.json())
+            .then(data => {
+                showMsg(data.success ? '✅ ' + data.message : '❌ ' + data.error,
+                       data.success ? 'success' : 'error');
+                loadKeys();
+            });
+        }
+
+        function deleteKey(key) {
+            if (!confirm('PERMANENTLY delete karein? Yeh undo nahi hoga.')) return;
+            fetch('/api/admin/keys/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key })
+            })
+            .then(r => r.json())
+            .then(data => {
+                showMsg(data.success ? '✅ ' + data.message : '❌ ' + data.error,
+                       data.success ? 'success' : 'error');
+                loadKeys();
+            });
+        }
+
+        function extendKey() {
+            const key = document.getElementById('extendKey').value.trim();
+            const days = parseInt(document.getElementById('extendDays').value);
+            if (!key || !days) {
+                showMsg('Key aur days dono daalo', 'error');
+                return;
+            }
+            fetch('/api/admin/keys/extend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: key, extra_days: days })
+            })
+            .then(r => r.json())
+            .then(data => {
+                showMsg(data.success ? '✅ Extended by ' + days + ' days' : '❌ ' + data.error,
+                       data.success ? 'success' : 'error');
+                if (data.success) {
+                    document.getElementById('extendKey').value = '';
+                    loadKeys();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

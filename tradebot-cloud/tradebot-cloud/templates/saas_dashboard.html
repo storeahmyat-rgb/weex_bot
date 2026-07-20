@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b0e11">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="TradingBot">
+    <link rel="manifest" href="/static/manifest.json">
+    <title>TradeBot SaaS - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/lightweight-charts.js') }}"></script>
+    <style>
+        .saas-bar {
+            background: #181a20; border-bottom: 1px solid #2a2e36;
+            padding: 8px 20px; display: flex; align-items: center;
+            justify-content: space-between; font-size: 12px; position: sticky;
+            top: 0; z-index: 200;
+        }
+        .saas-bar-left { display: flex; align-items: center; gap: 12px; }
+        .saas-bar-right { display: flex; align-items: center; gap: 14px; }
+        .saas-badge {
+            padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+        }
+        .saas-badge-active { background: rgba(14,203,129,0.15); color: #0ecb81; }
+        .saas-badge-inactive { background: rgba(246,70,93,0.15); color: #f6465d; }
+        .saas-user { color: #848e9c; }
+        .saas-logout {
+            background: none; border: 1px solid #2a2e36; color: #848e9c;
+            padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px;
+        }
+        .saas-logout:hover { color: #f6465d; border-color: #f6465d; }
+        .saas-admin-link {
+            color: #f0b90b; text-decoration: none; font-size: 11px;
+            padding: 4px 10px; border: 1px solid rgba(240,185,11,0.3); border-radius: 6px;
+        }
+        .saas-admin-link:hover { background: rgba(240,185,11,0.1); }
+        .license-box {
+            background: #1e2126; border: 1px solid #2a2e36; border-radius: 12px;
+            padding: 32px; max-width: 500px; margin: 60px auto; text-align: center;
+        }
+        .license-box h2 { margin-bottom: 12px; font-size: 20px; }
+        .license-box p { color: #848e9c; font-size: 13px; margin-bottom: 20px; }
+        .license-input {
+            width: 100%; padding: 14px; background: #0b0e11; border: 1px solid #2a2e36;
+            color: #eaecef; border-radius: 10px; font-size: 14px; text-align: center;
+            font-family: monospace; letter-spacing: 1px; margin-bottom: 12px;
+        }
+        .license-input:focus { outline: none; border-color: #f0b90b; }
+        .saas-btn-primary {
+            background: linear-gradient(135deg, #f0b90b 0%, #f8d12f 100%);
+            color: #0b0e11; border: none; padding: 14px 24px; border-radius: 10px;
+            font-weight: 700; cursor: pointer; font-size: 14px; width: 100%;
+        }
+        .saas-btn-primary:hover { transform: translateY(-1px); }
+        .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+        .alert-error { background: rgba(246,70,93,0.1); border: 1px solid rgba(246,70,93,0.3); color: #f6465d; }
+        .alert-success { background: rgba(14,203,129,0.1); border: 1px solid rgba(14,203,129,0.3); color: #0ecb81; }
+        .saas-loading {
+            text-align: center; padding: 60px 20px; color: #848e9c; font-size: 14px;
+        }
+        .saas-loading .spinner {
+            width: 40px; height: 40px; border: 3px solid #2a2e36;
+            border-top-color: #f0b90b; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- SaaS Auth Bar -->
+    <div class="saas-bar">
+        <div class="saas-bar-left">
+            <div style="width:24px;height:24px;background:linear-gradient(135deg,#f0b90b,#f8d12f);color:#0b0e11;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;">T</div>
+            <span style="font-weight:600;font-size:13px;">TradeBot SaaS</span>
+            <span id="saasSubBadge" class="saas-badge saas-badge-inactive">Loading...</span>
+        </div>
+        <div class="saas-bar-right">
+            <span id="saasAdminLink"></span>
+            <span class="saas-user" id="saasUserEmail">—</span>
+            <button class="saas-logout" onclick="saasLogout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- License Activation (shown if no active subscription) -->
+    <div id="licenseSection" style="display:none;">
+        <div class="license-box">
+            <h2>License Activate Karein</h2>
+            <p>Apna license key enter karein (admin se mila hoga)</p>
+            <div id="licAlert"></div>
+            <input type="text" id="licenseKey" class="license-input" placeholder="TRDBOT-XXXX-XXXX-XXXX-XXXX" style="text-transform: uppercase;">
+            <button class="saas-btn-primary" onclick="activateLicense()">Activate License</button>
+            <p style="margin-top: 16px; font-size: 11px; color: #848e9c;">
+                License nahi hai? Admin se contact karein.
+            </p>
+        </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loadingSection" style="display:none;">
+        <div class="saas-loading">
+            <div class="spinner"></div>
+            <div>Bot dashboard load ho raha hai...</div>
+        </div>
+    </div>
+
+    <!-- Bot Dashboard (shown if subscription active) -->
+    <div id="dashboardSection" style="display:none;">
+
+    <!-- Top Navigation (Bot-Engine) -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo">B</div>
+            <div>
+                <h1>Binance Futures Bot</h1>
+                <span class="subtitle">EMA Quad Strategy (8, 13, 21, 55) - Multi-Coin</span>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <div class="env-badge" id="envBadge" style="display:flex;gap:6px">
+                <span id="exchangeBadge">BINANCE</span>
+                <span style="color:#848e9c">|</span>
+                <span id="modeBadge">TESTNET</span>
+            </div>
+            <div class="status-pill" id="botStatusPill">
+                <span class="dot"></span>
+                <span id="botStatusText">STOPPED</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="layout">
+        <!-- LEFT: Settings + Position + Stats -->
+        <aside class="sidebar">
+            <!-- Settings Card -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Settings</h2>
+                    <button id="saveSettings" class="btn btn-sm btn-primary">Save</button>
+                </div>
+                <div class="card-body">
+                    <!-- Exchange Selector -->
+                    <div class="form-group">
+                        <label>Exchange</label>
+                        <div class="exchange-toggle">
+                            <button type="button" class="exchange-btn active" data-exchange="binance">Binance</button>
+                            <button type="button" class="exchange-btn" data-exchange="weex">WEEX</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="apiKey" placeholder="API Key" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>API Secret</label>
+                        <input type="password" id="apiSecret" placeholder="API Secret" autocomplete="off">
+                    </div>
+                    <div class="form-group hidden" id="passphraseGroup">
+                        <label>Passphrase (WEEX only)</label>
+                        <input type="password" id="apiPassphrase" placeholder="WEEX Passphrase" autocomplete="off">
+                    </div>
+
+                    <!-- Multi-Coin Selector -->
+                    <div class="form-group">
+                        <label>Coins (Multi-Coin) <button type="button" id="loadAllCoinsBtn" class="btn btn-sm" style="padding:2px 8px;font-size:10px;margin-left:6px">Load All Coins</button></label>
+                        <div class="coin-input-row">
+                            <input type="text" id="coinInput" placeholder="BTCUSDT" list="coinSuggestions">
+                            <button id="addCoinBtn" class="btn btn-sm btn-primary">+ Add</button>
+                        </div>
+                        <datalist id="coinSuggestions"></datalist>
+                        <div id="coinChips" class="coin-chips"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Timeframe</label>
+                            <select id="timeframe">
+                                <option value="1m">1m</option>
+                                <option value="5m">5m</option>
+                                <option value="15m">15m</option>
+                                <option value="1h">1h</option>
+                                <option value="4h">4h</option>
+                                <option value="1d" selected>1d (recommended)</option>
+                                <option value="1w">1w</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trade Mode</label>
+                            <select id="mode">
+                                <option value="both">Both (Long &amp; Short)</option>
+                                <option value="long">Long Only</option>
+                                <option value="short">Short Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Leverage (1-<span id="maxLevLabel">125</span>x)</label>
+                            <input type="number" id="leverage" value="10" min="1" max="500">
+                        </div>
+                        <div class="form-group">
+                            <label>Environment</label>
+                            <select id="testnet">
+                                <option value="true" selected>Demo / Testnet (Safe)</option>
+                                <option value="false">Mainnet (Real Money)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Amount Mode Toggle -->
+                    <div class="form-group">
+                        <label>Amount Mode</label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active" data-mode="fixed">Fixed USDT</button>
+                            <button type="button" class="toggle-btn" data-mode="percent">% of Wallet</button>
+                        </div>
+                    </div>
+                    <div class="form-group" id="fixedAmountGroup">
+                        <label>Amount (USDT)</label>
+                        <input type="number" id="amount" value="100" min="1" step="1">
+                    </div>
+                    <div class="form-group hidden" id="percentAmountGroup">
+                        <label>Wallet % (per trade)</label>
+                        <input type="number" id="amountPct" value="10" min="1" max="100" step="1">
+                        <div class="hint">Bot will use this % of available USDT balance per trade.</div>
+                    </div>
+
+                    <!-- Stop Loss / Take Profit (STRICT 1:3 RR) -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Stop Loss % (STRICT, min 0.5%)</label>
+                            <input type="number" id="stopLossPct" value="2" min="0.5" max="20" step="0.5" required>
+                            <div class="hint">SL minimum 0.5%, hamesha active</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Take Profit % (Auto 1:3 RR)</label>
+                            <input type="text" id="takeProfitPct" value="6.0" readonly
+                                style="background:#181a20;color:#0ecb81;font-weight:600">
+                            <div class="hint">ALWAYS = SL x 3 (1:3 RR hardcoded)</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-leverage">
+                        <span>Quick Lev:</span>
+                        <button class="btn btn-sm" data-lev="5">5x</button>
+                        <button class="btn btn-sm" data-lev="10">10x</button>
+                        <button class="btn btn-sm" data-lev="20">20x</button>
+                        <button class="btn btn-sm" data-lev="50">50x</button>
+                        <button class="btn btn-sm" data-lev="75">75x</button>
+                        <button class="btn btn-sm" data-lev="100">100x</button>
+                        <button class="btn btn-sm" data-lev="125">125x</button>
+                        <button class="btn btn-sm weex-only" data-lev="200" style="display:none">200x</button>
+                        <button class="btn btn-sm weex-only" data-lev="300" style="display:none">300x</button>
+                        <button class="btn btn-sm weex-only" data-lev="400" style="display:none">400x</button>
+                        <button class="btn btn-sm weex-only" data-lev="500" style="display:none">500x</button>
+                    </div>
+                    <div class="form-row" style="margin-top:8px">
+                        <div class="form-group" style="margin:0">
+                            <label style="color:#f0b90b;font-weight:600">Max Leverage</label>
+                            <button type="button" id="maxLeverageBtn" class="btn btn-block btn-primary" style="font-weight:600">SET 100x LEVERAGE</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bot Controls -->
+            <section class="card controls-card">
+                <div class="card-body">
+                    <div class="btn-group">
+                        <button id="startBtn" class="btn btn-success btn-lg">START BOT</button>
+                        <button id="stopBtn" class="btn btn-danger btn-lg" disabled>STOP BOT</button>
+                    </div>
+                    <button id="testConnBtn" class="btn btn-block" style="background:#1e2126;color:#0ecb81;border:1px solid #0ecb81;margin-top:6px;font-weight:600">TEST CONNECTION (Check API Keys)</button>
+                    <button id="closeBtn" class="btn btn-warning btn-block">Close Position (Selected Coin)</button>
+                    <button id="forceStopBtn" class="btn btn-block" style="background:#2a2e36;color:#f6465d;border:1px dashed #f6465d;margin-top:6px;font-size:11px">FORCE RESET (if stuck)</button>
+                </div>
+            </section>
+
+            <!-- Notifications -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Notifications</h2>
+                    <button id="testNotificationBtn" class="btn btn-sm btn-primary">Test (No Save)</button>
+                </div>
+                <div class="card-body">
+                    <div class="notif-help-box">
+                        <strong>Test button</strong> bina save kiye check karega. Pehle values daalo, phir Test dabao.
+                    </div>
+
+                    <!-- Telegram -->
+                    <div class="notif-channel">
+                        <label class="notif-toggle">
+                            <input type="checkbox" id="telegramEnabled">
+                            <span class="notif-label">Telegram</span>
+                        </label>
+                        <div class="notif-fields">
+                            <input type="text" id="telegramBotToken" placeholder="Bot Token (e.g. 8344811500:AAH1TWZ...)">
+                            <input type="text" id="telegramChatId" placeholder="Aapki Chat ID (e.g. 123456789)">
+                        </div>
+                        <div class="hint">
+                            <strong>Steps:</strong><br>
+                            1. Telegram pe <a href="https://t.me/BotFather" target="_blank">@BotFather</a> -> /newbot -> <strong>Bot Token</strong> copy karo<br>
+                            2. Apne naye bot ko <strong>/start</strong> message bhejo<br>
+                            3. <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> ko /start bhejo -> <strong>Chat ID</strong> milega (numbers)<br>
+                        </div>
+                    </div>
+
+                    <hr class="notif-divider">
+
+                    <!-- Email -->
+                    <div class="notif-channel">
+                        <label class="notif-toggle">
+                            <input type="checkbox" id="emailEnabled">
+                            <span class="notif-label">Email</span>
+                        </label>
+                        <div class="notif-fields">
+                            <input type="email" id="emailSender" placeholder="Sender Gmail (you@gmail.com)">
+                            <input type="password" id="emailPassword" placeholder="16-char App Password (NOT gmail password)">
+                            <input type="email" id="emailReceiver" placeholder="Receiver Email">
+                            <div class="form-row">
+                                <input type="text" id="emailSmtpServer" placeholder="SMTP Server" value="smtp.gmail.com">
+                                <input type="number" id="emailSmtpPort" placeholder="Port" value="587">
+                            </div>
+                        </div>
+                        <div class="hint">
+                            <strong>Gmail normal password kaam nahi karega!</strong><br>
+                            App Password banane ke steps:<br>
+                            1. Google Account -> Security<br>
+                            2. <strong>2-Step Verification</strong> ON karo<br>
+                            3. "App passwords" pe click karo<br>
+                            4. <strong>16-character password</strong> milega
+                        </div>
+                    </div>
+
+                    <hr class="notif-divider">
+
+                    <!-- WhatsApp -->
+                    <div class="notif-channel">
+                        <label class="notif-toggle">
+                            <input type="checkbox" id="whatsappEnabled">
+                            <span class="notif-label">WhatsApp</span>
+                        </label>
+                        <div class="notif-fields">
+                            <input type="text" id="whatsappPhone" placeholder="Phone (e.g. 923001234567, no +)">
+                            <input type="password" id="whatsappApikey" placeholder="CallMeBot API Key">
+                        </div>
+                        <div class="hint">
+                            1. WhatsApp pe <strong>+34 644 79 33 67</strong> ko add karo<br>
+                            2. "I allow callmebot to send me messages" bhejo<br>
+                            3. Reply mein API key milega
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats -->
+            <section class="card">
+                <div class="card-header"><h2>Stats</h2></div>
+                <div class="card-body stats-grid">
+                    <div class="stat">
+                        <div class="stat-label">USDT Balance</div>
+                        <div class="stat-value" id="statBalance">--</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Active Coins</div>
+                        <div class="stat-value" id="statCoins">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Trades Today</div>
+                        <div class="stat-value" id="statTrades">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Active Symbol</div>
+                        <div class="stat-value" id="statSymbol" style="font-size:14px">--</div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- RIGHT: Coin tabs + Chart + Indicators + Position + Logs -->
+        <section class="main-content">
+            <!-- Coin Tabs -->
+            <div class="card coin-tabs-card">
+                <div class="card-body coin-tabs" id="coinTabs">
+                    <span class="hint-inline">No coins added yet. Add coins from settings.</span>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2 id="chartTitle">Price Chart - Select a coin</h2>
+                    <div class="legend">
+                        <span class="legend-item"><span class="legend-color" style="background:#2196f3"></span>EMA 8</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#ff9800"></span>EMA 13</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#9c27b0"></span>EMA 21</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#f44336"></span>EMA 55</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="chart"></div>
+                </div>
+            </div>
+
+            <!-- Indicators + Position row -->
+            <div class="row-2">
+                <!-- Indicators -->
+                <div class="card">
+                    <div class="card-header"><h2>Live Indicators - <span id="indicatorsSymbol">--</span></h2></div>
+                    <div class="card-body">
+                        <div class="indicators-grid">
+                            <div class="indicator">
+                                <div class="ind-label">Mark Price</div>
+                                <div class="ind-value" id="indPrice">--</div>
+                            </div>
+                            <div class="indicator">
+                                <div class="ind-label" style="color:#2196f3">EMA 8</div>
+                                <div class="ind-value" id="indEma8">--</div>
+                            </div>
+                            <div class="indicator">
+                                <div class="ind-label" style="color:#ff9800">EMA 13</div>
+                                <div class="ind-value" id="indEma13">--</div>
+                            </div>
+                            <div class="indicator">
+                                <div class="ind-label" style="color:#9c27b0">EMA 21</div>
+                                <div class="ind-value" id="indEma21">--</div>
+                            </div>
+                            <div class="indicator">
+                                <div class="ind-label" style="color:#f44336">EMA 55</div>
+                                <div class="ind-value" id="indEma55">--</div>
+                            </div>
+                            <div class="indicator">
+                                <div class="ind-label">Signal</div>
+                                <div class="ind-value" id="indSignal">--</div>
+                            </div>
+                        </div>
+                        <!-- EMA Stack Visualizer -->
+                        <div class="ema-stack-viz">
+                            <div class="ema-stack-title">EMA Stack (top -> bottom)</div>
+                            <div id="emaStackList" class="ema-stack-list">
+                                <div class="ema-stack-empty">Waiting for data...</div>
+                            </div>
+                            <div class="ema-stack-rule" id="emaStackRule">Strategy: EMA55 at BOTTOM = BUY LONG | EMA55 at TOP = SELL SHORT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Position -->
+                <div class="card">
+                    <div class="card-header"><h2>Open Position - <span id="positionSymbol">--</span></h2></div>
+                    <div class="card-body position-grid">
+                        <div class="pos-row">
+                            <span>Side</span><strong id="posSide">NONE</strong>
+                        </div>
+                        <div class="pos-row">
+                            <span>Size</span><strong id="posSize">0.000</strong>
+                        </div>
+                        <div class="pos-row">
+                            <span>Entry Price</span><strong id="posEntry">--</strong>
+                        </div>
+                        <div class="pos-row">
+                            <span>Mark Price</span><strong id="posMark">--</strong>
+                        </div>
+                        <div class="pos-row">
+                            <span>Unrealized PnL</span>
+                            <strong id="posPnl" class="pnl-zero">$0.00</strong>
+                        </div>
+                        <div class="pos-row">
+                            <span>Leverage</span><strong id="posLeverage">1x</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs -->
+            <div class="card logs-card">
+                <div class="card-header">
+                    <h2>Activity Logs</h2>
+                    <button id="clearLogs" class="btn btn-sm">Clear</button>
+                </div>
+                <div class="card-body">
+                    <div id="logs" class="logs-container"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // SaaS-specific logic (auth, license, bot-engine process management)
+        let saasUserData = null;
+
+        async function saasLoadMe() {
+            try {
+                const r = await fetch('/api/auth/me');
+                const data = await r.json();
+                if (!data.success) { window.location.href = '/'; return; }
+                saasUserData = data.user;
+                renderSaasBar(data);
+                if (data.subscription.active) {
+                    await ensureBotEngineRunning();
+                } else {
+                    document.getElementById('licenseSection').style.display = 'block';
+                    document.getElementById('loadingSection').style.display = 'none';
+                    document.getElementById('dashboardSection').style.display = 'none';
+                }
+            } catch(e) { console.error('saasLoadMe error:', e); }
+        }
+
+        function renderSaasBar(data) {
+            document.getElementById('saasUserEmail').textContent = data.user.email;
+            const badge = document.getElementById('saasSubBadge');
+            if (data.subscription.active) {
+                badge.className = 'saas-badge saas-badge-active';
+                badge.textContent = data.subscription.plan + ' - ' + data.subscription.days_left + 'd left';
+            } else {
+                badge.className = 'saas-badge saas-badge-inactive';
+                badge.textContent = 'No License';
+            }
+            if (data.user.role === 'admin') {
+                document.getElementById('saasAdminLink').innerHTML = '<a href="/admin" class="saas-admin-link">Admin Panel</a>';
+            }
+        }
+
+        async function ensureBotEngineRunning() {
+            document.getElementById('licenseSection').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+            try {
+                const r = await fetch('/api/bot/ensure_running', { method: 'POST' });
+                const data = await r.json();
+                if (data.success) {
+                    document.getElementById('loadingSection').style.display = 'none';
+                    document.getElementById('dashboardSection').style.display = 'block';
+                    // Bot-engine is now running — re-init app.js (it fired before bot-engine was ready)
+                    setTimeout(() => {
+                        try { loadSettings(); } catch(e) { console.error('loadSettings retry:', e); }
+                        try { refreshStatus(); } catch(e) { console.error('refreshStatus retry:', e); }
+                        try { refreshBalance(); } catch(e) { console.error('refreshBalance retry:', e); }
+                        const exchange = document.querySelector('.exchange-btn.active')?.dataset.exchange || 'binance';
+                        try { refreshCoinDropdown(exchange); } catch(e) { console.error('refreshCoinDropdown retry:', e); }
+                        try { initSocket(); } catch(e) { console.error('initSocket retry:', e); }
+                    }, 500);
+                } else {
+                    document.getElementById('loadingSection').innerHTML =
+                        '<div style="color:#f6465d;">Bot start nahi ho paya: ' + (data.error || 'Unknown error') + '</div>';
+                }
+            } catch(e) {
+                document.getElementById('loadingSection').innerHTML =
+                    '<div style="color:#f6465d;">Network error: ' + e.message + '</div>';
+            }
+        }
+
+        async function activateLicense() {
+            const key = document.getElementById('licenseKey').value.trim().toUpperCase();
+            if (!key) { showLicAlert('License key daalein', 'error'); return; }
+            try {
+                const r = await fetch('/api/license/activate', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({key: key})
+                });
+                const data = await r.json();
+                if (data.success) {
+                    showLicAlert(data.message, 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showLicAlert(data.error || 'Activation failed', 'error');
+                }
+            } catch(e) { showLicAlert('Network error', 'error'); }
+        }
+
+        function showLicAlert(msg, type) {
+            const el = document.getElementById('licAlert');
+            el.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
+        }
+
+        async function saasLogout() {
+            await fetch('/api/auth/logout', {method: 'POST'});
+            window.location.href = '/';
+        }
+
+        // Initialize SaaS layer on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            saasLoadMe();
+        });
+    </script>
+</body>
+</html>

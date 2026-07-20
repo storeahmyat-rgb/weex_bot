@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeBot SaaS - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0b0e11; color: #eaecef; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; }
+        .header a { color: #f0b90b; text-decoration: none; font-size: 13px; }
+        .login-card { background: #1e2126; border: 1px solid #2a2e36; border-radius: 12px; padding: 32px; max-width: 400px; margin: 80px auto; }
+        .login-card h2 { text-align: center; margin-bottom: 8px; }
+        .login-card p { text-align: center; color: #848e9c; font-size: 13px; margin-bottom: 20px; }
+        .input { width: 100%; padding: 12px; background: #0b0e11; border: 1px solid #2a2e36; color: #eaecef; border-radius: 8px; font-size: 14px; margin-bottom: 12px; }
+        .btn { width: 100%; padding: 12px; background: #f0b90b; color: #0b0e11; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .tabs { display: flex; gap: 4px; background: #1e2126; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 8px; font-size: 13px; font-weight: 600; color: #848e9c; border: none; background: none; }
+        .tab.active { background: #f0b90b; color: #0b0e11; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: #1e2126; border: 1px solid #2a2e36; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid #2a2e36; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .card-body { padding: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .form-group { margin-bottom: 12px; }
+        .label { display: block; font-size: 11px; color: #848e9c; margin-bottom: 4px; text-transform: uppercase; }
+        .input-sm { width: 100%; padding: 8px 10px; background: #0b0e11; border: 1px solid #2a2e36; color: #eaecef; border-radius: 6px; font-size: 13px; }
+        .btn-create { background: #0ecb81; color: #0b0e11; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; }
+        .license-row { padding: 12px 20px; border-bottom: 1px solid #2a2e36; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
+        .license-row:last-child { border-bottom: none; }
+        .license-key { font-family: monospace; font-weight: 600; color: #f0b90b; }
+        .user-row { padding: 12px 20px; border-bottom: 1px solid #2a2e36; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
+        .user-row:last-child { border-bottom: none; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-align: center; }
+        .badge-active { background: rgba(14,203,129,0.15); color: #0ecb81; }
+        .badge-inactive { background: rgba(246,70,93,0.15); color: #f6465d; }
+        .badge-used { background: rgba(14,203,129,0.15); color: #0ecb81; }
+        .badge-unused { background: rgba(94,102,115,0.15); color: #848e9c; }
+        .badge-revoked { background: rgba(246,70,93,0.15); color: #f6465d; }
+        .badge-running { background: rgba(14,203,129,0.15); color: #0ecb81; }
+        .badge-banned { background: rgba(246,70,93,0.15); color: #f6465d; }
+        .btn-sm { padding: 5px 10px; font-size: 11px; border: none; border-radius: 4px; cursor: pointer; margin-left: 4px; }
+        .btn-revoke { background: #f6465d; color: white; }
+        .btn-delete { background: #2a2e36; color: #f6465d; border: 1px solid #f6465d; }
+        .btn-ban { background: #f6465d; color: white; }
+        .btn-unban { background: #0ecb81; color: #0b0e11; }
+        .copy-btn { background: #2a2e36; color: #f0b90b; border: 1px solid #f0b90b; }
+        .empty { text-align: center; padding: 40px; color: #848e9c; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: #1e2126; border: 1px solid #2a2e36; border-radius: 8px; padding: 16px; }
+        .stat-label { font-size: 10px; color: #848e9c; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value { font-size: 22px; font-weight: 700; }
+        .stat-value.green { color: #0ecb81; }
+        .stat-value.yellow { color: #f0b90b; }
+        .stat-value.red { color: #f6465d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Panel</h1>
+            <a href="/">← Back to Dashboard</a>
+        </div>
+
+        {% if admin_login_required %}
+        <div class="login-card">
+            <h2>Admin Login</h2>
+            <p>Admin password daalein</p>
+            <div id="err" style="color: #f6465d; text-align: center; margin-bottom: 12px; font-size: 13px; display: none;"></div>
+            <input type="password" id="adminPass" class="input" placeholder="Admin password">
+            <button class="btn" onclick="adminLogin()">Login as Admin</button>
+        </div>
+        <script>
+            async function adminLogin() {
+                const pass = document.getElementById('adminPass').value;
+                try {
+                    const r = await fetch('/api/admin/login', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({password: pass})
+                    });
+                    const data = await r.json();
+                    if (data.success) window.location.reload();
+                    else {
+                        const err = document.getElementById('err');
+                        err.textContent = data.error || 'Login failed';
+                        err.style.display = 'block';
+                    }
+                } catch(e) { alert('Network error'); }
+            }
+        </script>
+        {% else %}
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div id="totalUsers" class="stat-value">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Licenses</div>
+                <div id="activeLics" class="stat-value green">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Bots Running</div>
+                <div id="botsRunning" class="stat-value yellow">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Unused Licenses</div>
+                <div id="unusedLics" class="stat-value red">—</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('licenses', event)">License Keys</button>
+            <button class="tab" onclick="switchTab('users', event)">Users</button>
+        </div>
+
+        <!-- Licenses Tab -->
+        <div id="tab-licenses" class="tab-content active">
+            <div class="card">
+                <div class="card-header">Create New License</div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="label">Days</label>
+                            <select id="licDays" class="input-sm">
+                                <option value="7">7 days</option>
+                                <option value="30" selected>30 days</option>
+                                <option value="90">90 days</option>
+                                <option value="180">180 days</option>
+                                <option value="365">365 days</option>
+                                <option value="9999">Lifetime</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Plan</label>
+                            <select id="licPlan" class="input-sm">
+                                <option value="trial">Trial</option>
+                                <option value="basic" selected>Basic</option>
+                                <option value="pro">Pro</option>
+                                <option value="lifetime">Lifetime</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Note (optional)</label>
+                            <input type="text" id="licNote" class="input-sm" placeholder="Customer name etc">
+                        </div>
+                    </div>
+                    <button class="btn-create" onclick="createLicense()">+ Generate License Key</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">All License Keys</div>
+                <div id="licensesList" style="padding: 8px 0;">
+                    <div class="empty">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="tab-users" class="tab-content">
+            <div class="card">
+                <div class="card-header">User Management</div>
+                <div id="usersList" style="padding: 8px 0;">
+                    <div class="empty">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function switchTab(tab, event) {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                event.target.classList.add('active');
+                document.getElementById('tab-' + tab).classList.add('active');
+            }
+
+            async function loadAll() {
+                await Promise.all([loadLicenses(), loadUsers()]);
+            }
+
+            async function loadLicenses() {
+                try {
+                    const r = await fetch('/api/admin/licenses');
+                    const data = await r.json();
+                    if (data.success) {
+                        renderLicenses(data.licenses);
+                        updateStats(data.licenses);
+                    }
+                } catch(e) {}
+            }
+
+            async function loadUsers() {
+                try {
+                    const r = await fetch('/api/admin/users');
+                    const data = await r.json();
+                    if (data.success) renderUsers(data.users);
+                } catch(e) {}
+            }
+
+            function updateStats(licenses) {
+                const used = licenses.filter(l => l.used_by);
+                const unused = licenses.filter(l => !l.used_by && !l.revoked);
+                const active = licenses.filter(l => l.active && !l.revoked);
+                document.getElementById('totalUsers').textContent = licenses.length;
+                document.getElementById('activeLics').textContent = active.length;
+                document.getElementById('unusedLics').textContent = unused.length;
+            }
+
+            function renderLicenses(licenses) {
+                const list = document.getElementById('licensesList');
+                if (licenses.length === 0) {
+                    list.innerHTML = '<div class="empty">Koi license nahi hai. Niche se generate karein.</div>';
+                    return;
+                }
+                list.innerHTML = licenses.map(l => {
+                    const statusBadge = l.revoked ? '<span class="badge badge-revoked">revoked</span>' :
+                                       l.used_by ? '<span class="badge badge-used">used</span>' :
+                                       '<span class="badge badge-unused">unused</span>';
+                    const actions = `
+                        <button class="btn-sm copy-btn" onclick="copyKey('${l.key}')">Copy</button>
+                        ${!l.revoked ? `<button class="btn-sm btn-revoke" onclick="revokeLicense('${l.key}')">Revoke</button>` : ''}
+                        <button class="btn-sm btn-delete" onclick="deleteLicense('${l.key}')">Delete</button>
+                    `;
+                    return `
+                        <div class="license-row">
+                            <div class="license-key">${l.key}</div>
+                            <div>${l.plan}</div>
+                            <div>${l.days === 9999 ? 'Lifetime' : l.days + 'd'}</div>
+                            <div>${l.expires_at ? new Date(l.expires_at).toLocaleDateString() : '—'}</div>
+                            <div>${statusBadge}</div>
+                            <div>${actions}</div>
+                        </div>`;
+                }).join('');
+            }
+
+            function renderUsers(users) {
+                const list = document.getElementById('usersList');
+                if (users.length === 0) {
+                    list.innerHTML = '<div class="empty">Koi user nahi hai.</div>';
+                    return;
+                }
+                list.innerHTML = users.map(u => {
+                    const subBadge = u.subscription.active ?
+                        `<span class="badge badge-active">${u.subscription.plan} • ${u.subscription.days_left}d</span>` :
+                        '<span class="badge badge-inactive">inactive</span>';
+                    const botBadge = u.bot_running ?
+                        '<span class="badge badge-running">running</span>' :
+                        '<span class="badge" style="background:rgba(94,102,115,0.15);color:#848e9c;">stopped</span>';
+                    const banBadge = u.banned ? '<span class="badge badge-banned">banned</span>' : '';
+                    const actions = `
+                        <button class="btn-sm ${u.banned ? 'btn-unban' : 'btn-ban'}" onclick="banUser('${u.id}', ${!u.banned})">${u.banned ? 'Unban' : 'Ban'}</button>
+                        <button class="btn-sm btn-delete" onclick="deleteUser('${u.id}')">Delete</button>
+                    `;
+                    return `
+                        <div class="user-row">
+                            <div>
+                                <div style="font-weight:600;">${u.email}</div>
+                                <div style="color:#848e9c;font-size:11px;">${u.name} • License: ${u.license_key || 'none'}</div>
+                            </div>
+                            <div>${subBadge}</div>
+                            <div>${botBadge}</div>
+                            <div>${banBadge}</div>
+                            <div>${actions}</div>
+                        </div>`;
+                }).join('');
+            }
+
+            async function createLicense() {
+                const days = parseInt(document.getElementById('licDays').value);
+                const plan = document.getElementById('licPlan').value;
+                const note = document.getElementById('licNote').value;
+                try {
+                    const r = await fetch('/api/admin/licenses/create', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({days, plan, note})
+                    });
+                    const data = await r.json();
+                    if (data.success) {
+                        alert('✅ License generated: ' + data.license.key);
+                        navigator.clipboard.writeText(data.license.key);
+                        document.getElementById('licNote').value = '';
+                        loadLicenses();
+                    } else {
+                        alert('❌ ' + (data.error || 'Failed'));
+                    }
+                } catch(e) { alert('Network error'); }
+            }
+
+            function copyKey(key) {
+                navigator.clipboard.writeText(key);
+                alert('Copied: ' + key);
+            }
+
+            async function revokeLicense(key) {
+                if (!confirm('Revoke this license? User ka bot stop ho jayega.')) return;
+                try {
+                    const r = await fetch('/api/admin/licenses/revoke', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({key})
+                    });
+                    const data = await r.json();
+                    if (data.success) { alert('✅ Revoked'); loadLicenses(); }
+                    else alert('❌ ' + (data.error || 'Failed'));
+                } catch(e) { alert('Network error'); }
+            }
+
+            async function deleteLicense(key) {
+                if (!confirm('Permanently delete this license?')) return;
+                try {
+                    const r = await fetch('/api/admin/licenses/delete', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({key})
+                    });
+                    const data = await r.json();
+                    if (data.success) { alert('✅ Deleted'); loadLicenses(); }
+                    else alert('❌ ' + (data.error || 'Failed'));
+                } catch(e) { alert('Network error'); }
+            }
+
+            async function banUser(userId, banned) {
+                if (banned && !confirm('Ban this user? Bot stop ho jayega.')) return;
+                try {
+                    const r = await fetch('/api/admin/ban', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({user_id: userId, banned})
+                    });
+                    const data = await r.json();
+                    if (data.success) { loadUsers(); }
+                    else alert('❌ ' + (data.error || 'Failed'));
+                } catch(e) { alert('Network error'); }
+            }
+
+            async function deleteUser(userId) {
+                if (!confirm('PERMANENTLY delete this user? Undo nahi hoga!')) return;
+                try {
+                    const r = await fetch('/api/admin/delete', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({user_id: userId})
+                    });
+                    const data = await r.json();
+                    if (data.success) { loadUsers(); }
+                    else alert('❌ ' + (data.error || 'Failed'));
+                } catch(e) { alert('Network error'); }
+            }
+
+            loadAll();
+        </script>
+        {% endif %}
+    </div>
+</body>
+</html>

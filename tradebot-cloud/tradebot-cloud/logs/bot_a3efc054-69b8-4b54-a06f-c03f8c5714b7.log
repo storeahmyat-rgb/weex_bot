@@ -1,0 +1,89 @@
+2026-07-19 23:10:00,291 [INFO] app: ============================================================
+2026-07-19 23:10:00,296 [INFO] app:  Bot Engine - Starting (port 5001)
+2026-07-19 23:10:00,298 [INFO] app: ============================================================
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-07-19 23:10:00,361 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-07-19 23:10:00,361 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-07-19 23:11:58,258 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:11:58] "[33mGET /admin HTTP/1.1[0m" 404 -
+2026-07-19 23:11:58,614 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:11:58] "GET /favicon.ico HTTP/1.1" 200 -
+2026-07-19 23:12:02,506 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:02] "[33mGET /symbols HTTP/1.1[0m" 404 -
+2026-07-19 23:12:04,650 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:04] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:08,445 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:08] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:11,122 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:11] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:12,442 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:12] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:12:14,129 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:14] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:17,412 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:17] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:20,127 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:20] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:22,418 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:22] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:12:23,095 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:23] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:26,436 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:26] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:29,134 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:29] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:32,410 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:32] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:32,419 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:32] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:12:35,112 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:35] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:38,405 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:38] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:41,139 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:41] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:42,433 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:42] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:12:44,161 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:44] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:47,435 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:47] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:50,108 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:50] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:52,478 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:52] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:12:52,742 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:52] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:56,100 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:56] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:12:59,427 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:12:59] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:02,104 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:02] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:02,424 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:02] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:13:05,432 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:05] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:08,103 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:08] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:11,445 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:11] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:12,113 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:12] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:13:14,437 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:14] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:17,123 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:17] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:20,433 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:20] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:22,100 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:22] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:13:23,123 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:23] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:26,128 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:26] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:29,415 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:29] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:32,128 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:32] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:32,442 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:32] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:13:35,426 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:35] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:38,110 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:38] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:41,435 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:41] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:42,115 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:42] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:13:44,455 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:44] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:47,103 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:47] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:50,423 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:50] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:52,119 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:52] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:13:53,439 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:53] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:56,117 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:56] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:13:59,424 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:13:59] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:02,111 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:02] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:02,439 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:02] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:14:05,430 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:05] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:08,117 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:08] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:11,423 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:11] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:12,104 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:12] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:14:14,431 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:14] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:17,105 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:17] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:20,429 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:20] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:22,115 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:22] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:14:23,423 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:23] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:48,129 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:14:48,420 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:14:48] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:15:48,400 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:15:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:15:48,411 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:15:48] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:16:48,140 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:16:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:16:48,440 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:16:48] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:17:40,421 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:17:40] "GET /api/config HTTP/1.1" 200 -
+2026-07-19 23:17:40,432 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:17:40] "GET /api/status HTTP/1.1" 200 -
+2026-07-19 23:17:42,274 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:17:42] "GET /api/symbols HTTP/1.1" 200 -
+2026-07-19 23:17:48,433 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:17:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:17:48,436 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:17:48] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:18:48,107 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:18:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:18:48,432 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:18:48] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:19:48,451 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:19:48] "[33mGET /balance HTTP/1.1[0m" 404 -
+2026-07-19 23:19:48,455 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:19:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:20:48,121 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:20:48] "[33mGET /status HTTP/1.1[0m" 404 -
+2026-07-19 23:20:48,431 [INFO] werkzeug: 127.0.0.1 - - [19/Jul/2026 23:20:48] "[33mGET /balance HTTP/1.1[0m" 404 -
